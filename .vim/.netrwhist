@@ -1,0 +1,3 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =1
+let g:netrw_dirhist_1='/Users/Kyle/clinic/beluga_ws/src/beluga_ros/vnccpplib/include'
