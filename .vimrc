@@ -41,7 +41,7 @@ nnoremap k gk
 nnoremap J L
 nnoremap K H
 nnoremap H ^
-nnoremap L 0
+nnoremap L $
 nnoremap <c-j> <c-y>
 nnoremap <c-k> <c-e>
 
@@ -79,6 +79,7 @@ let g:airline_theme = 'luna'
 ""
 " File specific options
 au BufWritePost *.tex call PdfLatex()
+au FileType tex set spell
 
 function! PdfLatex()
   silent !latexmk -pdf -interaction=nonstopmode % > .pdflatex_log
@@ -88,3 +89,13 @@ function! PdfLatex()
   endif
 endfunction
 
+""
+" Spellcheck shortcuts
+nnoremap <leader>s ms[sz=1<cr>`s
+inoremap <leader>s <esc>ms[sz=1<cr>`sa
+
+""
+" Tabs
+set tabstop=2
+set softtabstop=0 expandtab
+set shiftwidth=2
