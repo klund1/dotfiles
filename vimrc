@@ -27,6 +27,8 @@ call plug#end()
 " YouCompleteMe configuration
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_always_populate_location_list = 1
+
+" vim-codefmt configuration
 augroup autoformat_settings
   autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
   autocmd FileType go AutoFormatBuffer gofmt
