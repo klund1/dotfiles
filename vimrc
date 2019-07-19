@@ -12,17 +12,28 @@ Plug 'Valloric/YouCompleteMe'
 Plug 'airblade/vim-gitgutter'
 Plug 'chaoren/vim-wordmotion'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'google/vim-maktaba'
+Plug 'google/vim-codefmt'
+Plug 'google/vim-glaive'
 Plug 'jreybert/vimagit'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'klund1/jumpsearch'
 Plug 'klund1/vim-switchcase'
 Plug 'leafgarland/typescript-vim'
 Plug 'tpope/vim-fugitive'
+Plug 'wincent/terminus'
 call plug#end()
 
 " YouCompleteMe configuration
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_always_populate_location_list = 1
+augroup autoformat_settings
+  autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
+  autocmd FileType go AutoFormatBuffer gofmt
+  autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
+  autocmd FileType java AutoFormatBuffer google-java-format
+  autocmd FileType python AutoFormatBuffer yapf
+augroup END
 
 " vimagit configuration
 nnoremap <leader>m :call magit#show_magit('t')<cr>
@@ -60,6 +71,14 @@ set scrolloff=3
 set showtabline=2
 set laststatus=2
 
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Common Typos
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+command! Q q
+command! WQ wq
+command! Wq wq
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Statusline
@@ -100,6 +119,12 @@ autocmd InsertLeave * setlocal hlsearch lz
 inoremap <silent><Esc> <Esc>:nohl<bar>set nolz<CR>
 inoremap <silent><C-c> <C-c>:nohl<bar>set nolz<CR>
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Tabs
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+set tabstop=2
+set shiftwidth=2
+set expandtab
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Movement
@@ -217,10 +242,10 @@ function! OpenFileTab(filename)
   execute 'tabe' a:filename
 endfunction
 function! HeaderFilename()
-  return substitute(@%, '\(_test\)\?\.cc$', '\.h', '')
+  return substitute(@%, '\([^/]*\)/src/\(.*\)\.cpp$', '\1/include/\1/\2\.h', '')
 endfunction
 function! ImplFilename()
-  return substitute(@%, '\(\(_test\)\.cc\|\.h\)$', '\.cc', '')
+  return substitute(@%, '\([^/]*\)/include/\1/\(.*\).h$', '\1/src/\2\.cpp', '')
 endfunction
 function! TestFilename()
   return substitute(@%, '\.\(h\|cc\)$', '_test\.cc', '')
