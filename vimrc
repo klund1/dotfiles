@@ -1,5 +1,5 @@
 set nocompatible
-filetype plugin indent on
+filetype plugin on
 let mapleader=" "
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -8,25 +8,41 @@ let mapleader=" "
 
 call plug#begin('~/.vim/plugged')
 Plug 'NLKNguyen/papercolor-theme'
+
 Plug 'Valloric/YouCompleteMe'
 Plug 'airblade/vim-gitgutter'
 Plug 'chaoren/vim-wordmotion'
 Plug 'christoomey/vim-tmux-navigator'
+Plug 'ervandew/supertab'
 Plug 'google/vim-maktaba'
 Plug 'google/vim-codefmt'
 Plug 'google/vim-glaive'
 Plug 'jreybert/vimagit'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 Plug 'klund1/jumpsearch'
 Plug 'klund1/vim-switchcase'
 Plug 'leafgarland/typescript-vim'
+Plug 'SirVer/ultisnips'
 Plug 'tpope/vim-fugitive'
-Plug 'wincent/terminus'
+
+" trying out
+Plug 'dyng/ctrlsf.vim'
+Plug 'terryma/vim-multiple-cursors'
 call plug#end()
 
 " YouCompleteMe configuration
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_always_populate_location_list = 1
+let g:ycm_extra_conf_globlist = ['~/src/*']
+let g:ycm_goto_buffer_command = 'verical-split'
+nnoremap g] :YcmCompleter GoTo<cr>
+nnoremap ]] :vsp <cr><c-w>l:YcmCompleter GoTo<cr><c-w>h
+nnoremap ]t :tab split <cr>:YcmCompleter GoTo<cr>
+" make YCM compatible with UltiSnips (using supertab)
+let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+let g:SuperTabDefaultCompletionType = '<C-n>'
 
 " vim-codefmt configuration
 augroup autoformat_settings
@@ -50,6 +66,8 @@ let g:fzf_action = {
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-s': 'split',
   \ 'ctrl-v': 'vsplit' }
+let g:fzf_buffers_jump = 1
+nnoremap <leader>f :Files<cr>
 
 "vim-wordmotion configuration
 let g:wordmotion_prefix = '<leader>'
@@ -59,6 +77,24 @@ nnoremap <leader>cs :SwitchSnakeCase<cr>
 nnoremap <leader>cS :SwitchCapitalSnakeCase<cr>
 nnoremap <leader>cc :SwitchCamelCase<cr>
 nnoremap <leader>cC :SwitchCapitalCamelCase<cr>
+
+" UltiSnips configuration
+let g:UltiSnipsJumpForwardTrigger = "<c-j>"
+let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
+let g:UltiSnipsExpandTrigger = "<c-j>"
+let g:ulti_expand_or_jump_res = 1
+function! <SID>ExpandSnippetOrReturn()
+  let snippet = UltiSnips#ExpandSnippetOrJump()
+  if g:ulti_expand_or_jump_res > 0
+    return snippet
+  else
+    return "\<CR>"
+  endif
+endfunction
+inoremap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+
+" CtrlSF configuration
+nnoremap \ :CtrlSF 
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -121,12 +157,14 @@ autocmd InsertLeave * setlocal hlsearch lz
 inoremap <silent><Esc> <Esc>:nohl<bar>set nolz<CR>
 inoremap <silent><C-c> <C-c>:nohl<bar>set nolz<CR>
 
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set tabstop=2
 set shiftwidth=2
 set expandtab
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Movement
@@ -225,10 +263,6 @@ set diffopt+=vertical,filler
 nnoremap f :vertical wincmd f<cr>
 nnoremap F <c-w>f
 nnoremap <c-f> <c-w>gf
-" goto definition
-set tags+=tags;/
-nnoremap ]] :vsp <cr><c-w>l:exec("tag ".expand("<cword>"))<cr><c-w>h
-nnoremap ]t :tab split <cr>:exec("tag ".expand("<cword>"))<cr>
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

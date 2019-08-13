@@ -2,7 +2,7 @@
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
 
 # Path to your oh-my-zsh installation.
-export ZSH="/usr/local/google/home/kylelund/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 ZSH_THEME="bira"
 
@@ -31,7 +31,6 @@ setopt HIST_IGNORE_ALL_DUPS
 alias find-in-file="find -type f -print0 | xargs -0 grep -s"
 alias find-file="find -type f | grep -s"
 alias :q=exit
-alias vim=nvim
 function replace {
   find -type f | xargs sed -i -e "s/${1}/${2}/g"
 }
