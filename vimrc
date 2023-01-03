@@ -1,146 +1,192 @@
-set nocompatible
-filetype plugin on
 let mapleader=" "
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plugins
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call plug#begin(stdpath('config') . '/plugged')
 
-call plug#begin('~/.vim/plugged')
-Plug 'NLKNguyen/papercolor-theme'
+" Code completion
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+set hidden
+set nobackup
+set nowritebackup
+set updatetime=300
+set shortmess+=c
+set signcolumn=yes
 
-Plug 'Valloric/YouCompleteMe'
-Plug 'airblade/vim-gitgutter'
-Plug 'chaoren/vim-wordmotion'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'ervandew/supertab'
+"" " Use tab for trigger completion with characters ahead and navigate.
+"" " Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
+"" inoremap <silent><expr> <TAB>
+""       \ pumvisible() ? "\<C-n>" :
+""       \ <SID>check_back_space() ? "\<TAB>" :
+""       \ coc#refresh()
+"" inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+"" 
+"" function! s:check_back_space() abort
+""   let col = col('.') - 1
+""   return !col || getline('.')[col - 1]  =~# '\s'
+"" endfunction
+"" 
+"" " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
+"" " Coc only does snippet and additional edit on confirm.
+"" inoremap <expr> <cr> coc#pum#visible() ? coc#_select_confirm() : "\<CR>"
+"" 
+"" " Use <c-s> for snippets
+"" let g:coc_snippet_next = '<C-s>'
+"" inoremap <silent><expr> <C-s>
+""     \ coc#expandableOrJumpable() 
+""     \  ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>"
+""     \  : "\<C-s>"
+
+" Map <tab> for trigger completion, completion confirm, snippet expand and jump
+" like VSCode: >
+inoremap <silent><expr> <TAB>
+  \ coc#pum#visible() ? coc#_select_confirm() :
+  \ coc#expandableOrJumpable() ?
+  \ "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+  \ <SID>check_back_space() ? "\<TAB>" :
+  \ coc#refresh()
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+let g:coc_snippet_next = '<tab>'
+
+
+" Use `[e` and `]e` to navigate diagnostics
+nmap <silent> [w <Plug>(coc-diagnostic-prev)
+nmap <silent> ]w <Plug>(coc-diagnostic-next)
+nmap <silent> [e <Plug>(coc-diagnostic-prev-error)
+nmap <silent> ]e <Plug>(coc-diagnostic-next-error)
+
+command! Rename exec "normal <Plug>(coc-rename)"
+
+" Remap keys for gotos
+nmap <silent> gd :call CocAction('jumpDefinition', 'vsplit')<cr>
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> gh :vs<cr>:CocCommand clangd.switchSourceHeader<cr>
+nmap <silent> gcc :vs<cr>:CocCommand clangd.switchSourceHeader<cr>
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+nmap <silent> <c-i> :call CocActionAsync('doHover')<cr>
+
+" Build, Run, etc.
+Plug 'skywind3000/asynctasks.vim'
+Plug 'skywind3000/asyncrun.vim'
+let g:asyncrun_open = 6
+let g:asyncrun_rootmarks = ['.git']
+let g:asynctasks_term_pos = 'right'
+nmap <silent> <c-b>p :AsyncTask project-build<cr>
+nmap <silent> <c-b><c-b> :AsyncTask file-build<cr>
+nmap <silent> <c-b>f :AsyncTask file-build<cr>
+nmap <silent> <c-b>r :AsyncTask file-build-run<cr>
+command! Run AsyncTask file-build-run
+
+" Code formatting
 Plug 'google/vim-maktaba'
 Plug 'google/vim-codefmt'
 Plug 'google/vim-glaive'
-Plug 'jreybert/vimagit'
-Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'klund1/jumpsearch'
-Plug 'klund1/vim-switchcase'
-Plug 'leafgarland/typescript-vim'
-Plug 'SirVer/ultisnips'
-Plug 'tpope/vim-fugitive'
-
-" trying out
-Plug 'dyng/ctrlsf.vim'
-Plug 'terryma/vim-multiple-cursors'
-call plug#end()
-
-" YouCompleteMe configuration
-let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_always_populate_location_list = 1
-let g:ycm_extra_conf_globlist = ['~/src/*']
-let g:ycm_goto_buffer_command = 'verical-split'
-nnoremap g] :YcmCompleter GoTo<cr>
-nnoremap ]] :vsp <cr><c-w>l:YcmCompleter GoTo<cr><c-w>h
-nnoremap ]t :tab split <cr>:YcmCompleter GoTo<cr>
-" make YCM compatible with UltiSnips (using supertab)
-let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-let g:SuperTabDefaultCompletionType = '<C-n>'
-
-" vim-codefmt configuration
 augroup autoformat_settings
-  autocmd FileType c,cpp,proto,javascript AutoFormatBuffer clang-format
+  autocmd FileType c,cpp,cuda AutoFormatBuffer clang-format
+  autocmd FileType javascript,typescript AutoFormatBuffer prettier
   autocmd FileType go AutoFormatBuffer gofmt
   autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
   autocmd FileType java AutoFormatBuffer google-java-format
-  autocmd FileType python AutoFormatBuffer yapf
+  " autocmd FileType python AutoFormatBuffer "black -l 79"
+  autocmd FileType rust AutoFormatBuffer rustfmt
+  autocmd FileType sh,zsh AutoFormatBuffer shfmt
 augroup END
 
-" vimagit configuration
-nnoremap <leader>m :call magit#show_magit('t')<cr>
-let g:magit_auto_foldopen=1
-let g:magit_default_fold_level=1
-let g:magit_default_show_all_files=0
-autocmd User VimagitEnterCommit setlocal textwidth=72
-autocmd User VimagitLeaveCommit setlocal textwidth=0
+" make window navigation work with tmux
+Plug 'christoomey/vim-tmux-navigator'
 
-" fzf configuration
+" Fuzzy finding
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 let g:fzf_action = {
+  \ 'ctrl-o': 'edit',
   \ 'ctrl-t': 'tab split',
   \ 'ctrl-s': 'split',
   \ 'ctrl-v': 'vsplit' }
 let g:fzf_buffers_jump = 1
+let g:fzf_layout = { 'down': '10%' }
 nnoremap <leader>f :Files<cr>
+nnoremap <leader>o :Buffers<cr>
 
-"vim-wordmotion configuration
+" Moving through words
+Plug 'chaoren/vim-wordmotion'
 let g:wordmotion_prefix = '<leader>'
 
-" vim-switchcase configuration
+" CamelCase -> snake_case, etc.
+Plug 'klund1/vim-switchcase'
 nnoremap <leader>cs :SwitchSnakeCase<cr>
 nnoremap <leader>cS :SwitchCapitalSnakeCase<cr>
 nnoremap <leader>cc :SwitchCamelCase<cr>
 nnoremap <leader>cC :SwitchCapitalCamelCase<cr>
 
-" UltiSnips configuration
-let g:UltiSnipsJumpForwardTrigger = "<c-j>"
-let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
-let g:UltiSnipsExpandTrigger = "<c-j>"
-let g:ulti_expand_or_jump_res = 1
-function! <SID>ExpandSnippetOrReturn()
-  let snippet = UltiSnips#ExpandSnippetOrJump()
-  if g:ulti_expand_or_jump_res > 0
-    return snippet
-  else
-    return "\<CR>"
-  endif
-endfunction
-inoremap <expr> <CR> pumvisible() ? "<C-R>=<SID>ExpandSnippetOrReturn()<CR>" : "\<CR>"
+" Colorscheme
+Plug 'NLKNguyen/papercolor-theme'
+let g:PaperColor_Theme_Options = {
+ \  'theme': {
+ \    'default.dark': {
+ \      'override': {
+ \        'diffdelete_fg':['#808080', ''],
+ \        'diffdelete_bg':['#3a3a3a', ''],
+ \      }
+ \    }
+ \  }
+ \}
 
-" CtrlSF configuration
-nnoremap \ :CtrlSF 
+" Git
+Plug 'tpope/vim-fugitive'
+
+" Searching
+Plug 'stefandtw/quickfix-reflector.vim'
+Plug 'jremmen/vim-ripgrep'
+let g:rg_command = 'rg --vimgrep -S'
+
+" Rust
+Plug 'rust-lang/rust.vim'
+
+" Better * behavior
+Plug 'haya14busa/vim-asterisk'
+map * <Plug>(asterisk-z*)
+map # <Plug>(asterisk-z#)
+map g* <Plug>(asterisk-zg*)
+map g# <Plug>(asterisk-zg#)
+
+" CamelCase spellcheck
+Plug 'kamykn/spelunker.vim'
+Plug 'kamykn/popup-menu.nvim'
+set nospell
+
+call plug#end()
 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Display Options
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-syntax on
-set background=dark
 colorscheme PaperColor
 set cursorline
-set scrolloff=3
-set showtabline=2
-set laststatus=2
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Common Typos
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-command! Q q
-command! WQ wq
-command! Wq wq
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Statusline
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-function! ErrorsMessage()
-  let l:number_of_errors = len(getloclist(0))
-  if l:number_of_errors == 0
-    return ""
-  endif
-  return "[Errors]"
-endfunction
-
 set statusline= " Clear statusline
 set statusline+=%f " Filename
 set statusline+=\ %m%r%h%q " Modified, Read-Only,
-set statusline+=\ %{ErrorsMessage()} " Adds [Errors] tag if there are errors
+set statusline+=\ %{coc#status()}%{get(b:,'coc_current_function','')} " CoC status
 set statusline+=%= " Right align
 set statusline+=%l,%c " Line, collumn
 for i in range(10) " Add 10 spaces
   set statusline+=\ 
 endfor
 set statusline+=%P " Percent of file
-
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Line Numbering
@@ -150,21 +196,29 @@ set statusline+=%P " Percent of file
 " mode.
 set number
 set rnu
-autocmd InsertEnter * setlocal nornu
-autocmd InsertLeave * setlocal rnu
-autocmd InsertEnter * setlocal nohlsearch
-autocmd InsertLeave * setlocal hlsearch lz
-inoremap <silent><Esc> <Esc>:nohl<bar>set nolz<CR>
-inoremap <silent><C-c> <C-c>:nohl<bar>set nolz<CR>
-
+autocmd TermEnter * setlocal nonumber nornu
+autocmd TermLeave * setlocal number rnu
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Tabs
+" Pasting
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set tabstop=2
-set shiftwidth=2
-set expandtab
 
+nnoremap <leader>p "0p
+nnoremap <leader>P "0P
+nnoremap <C-p> "+p
+inoremap <C-p> <esc>"+pi
+nnoremap <C-y> "+y
+vnoremap <C-y> "+y
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Searching
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+set wildmode=longest:full,full
+set wildmenu
+set ignorecase
+set smartcase
+nnoremap ,<space> :noh<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Movement
@@ -179,18 +233,18 @@ vnoremap L $
 let g:scroll_speed=5
 
 function! ScrollUp()
-  if line(".") <= (line("w0")+&scrolloff)
+  let l:original_line = line(".")
+  exec "normal! H"
+  if l:original_line == line(".")
     exec "normal! ".g:scroll_speed."k"
-  else
-    exec "normal! H"
   endif
 endfunction
 
 function! ScrollDown()
-  if line(".") >= (line("w$")-&scrolloff)
+  let l:original_line = line(".")
+  exec "normal! L"
+  if l:original_line == line(".")
     exec "normal! ".g:scroll_speed."j"
-  else
-    exec "normal! L"
   endif
 endfunction
 
@@ -211,155 +265,170 @@ nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
+tnoremap <C-h> <C-\><C-n><C-w>h
+tnoremap <C-j> <C-\><C-n><C-w>j
+tnoremap <C-k> <C-\><C-n><C-w>k
+tnoremap <C-l> <C-\><C-n><C-w>l
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Searching
+" Tabs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-set hlsearch
-set noincsearch
-noh
-set wildmode=longest:full,full
-set wildmenu
-set ignorecase
-set smartcase
-nnoremap ,<space> :noh<cr>
-
+set tabstop=2
+set shiftwidth=2
+set expandtab
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Pasting
+" For-Each-Window commands
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-nnoremap <leader>p "0p
-nnoremap <leader>P "0P
-nnoremap <C-p> "+p
-inoremap <C-p> <esc>"+pi
-
+command! W windo w
+command! Q windo q
+command! WQ windo wq
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Source and open vimrc
+" Source and open config
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-nnoremap <leader>r :source ~/.vimrc<cr>
-nnoremap grc :tabe ~/.vimrc<cr>
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Git commit/diff options
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-autocmd FileType gitcommit set spell
-set diffopt+=vertical,filler
-
+nnoremap <leader>r :source ~/.config/nvim/init.vim<cr>
+nnoremap grc :tabe ~/.config/nvim/init.vim<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Go-To File
+" Number Manipulation
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" gf    - open in buffer
-" f     - open in vsplit
-" F     - open in split
-" <c-f> - open in tab
-nnoremap f :vertical wincmd f<cr>
-nnoremap F <c-w>f
-nnoremap <c-f> <c-w>gf
-
+nnoremap + <c-a>
+nnoremap - <c-x>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Open related files
+" Text wrapping
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" TODO: use vim-projectionist
-
-function! OpenFileVsplit(filename)
-  execute 'vs' a:filename
-endfunction
-function! OpenFileTab(filename)
-  execute 'tabe' a:filename
-endfunction
-function! HeaderFilename()
-  return substitute(@%, '\([^/]*\)/src/\(.*\)\.cpp$', '\1/include/\1/\2\.h', '')
-endfunction
-function! ImplFilename()
-  return substitute(@%, '\([^/]*\)/include/\1/\(.*\).h$', '\1/src/\2\.cpp', '')
-endfunction
-function! TestFilename()
-  return substitute(@%, '\.\(h\|cc\)$', '_test\.cc', '')
-endfunction
-nnoremap gh :call OpenFileVsplit(HeaderFilename())<cr>
-nnoremap gcc :call OpenFileVsplit(ImplFilename())<cr>
-nnoremap gt :call OpenFileVsplit(TestFilename())<cr>
-
+autocmd FileType txt,tex set tw=80
+autocmd FileType txt,tex set fo+=a
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Goto Error
+" Terminal
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" TODO: Make this a plugin
+tnoremap <silent> <esc><esc> <c-\><c-n>
+if has('nvim')
+  autocmd TermClose * call feedkeys("\<c-\>\<c-n>")
+endif
 
-function! PositionIsBefore(pos1, pos2)
-  if a:pos1[0] != a:pos2[0]
-    return a:pos1[0] < a:pos2[0]
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Reflow
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! Reflow(start_line, end_line)
+
+  silent! exec a:end_line.','.a:end_line.'yank x'
+  let end_line_text=@x
+
+  let start = string(a:start_line)
+  let end = string(a:end_line - 1)
+
+  let modified_lines=0
+
+  if (end_line_text =~ '^\s*//\+.*')
+    silent! exec start.','.end.'s:\n\s*//\+::g'
+    let modified_lines=1
+  elseif (end_line_text =~ '^\s*".*')
+    silent! exec start.','.end.'s/"\s*\n\s*"//g'
+    let modified_lines=1
+  elseif (end_line_text =~ '^\s*''.*')
+    silent! exec start.','.end.'s/''\s*\n\s*''//g'
+    let modified_lines=1
   endif
-  return a:pos1[1] < a:pos2[1]
-endfunction
 
-function! PositionIsAfter(pos1, pos2)
-  if a:pos1[0] != a:pos2[0]
-    return a:pos1[0] > a:pos2[0]
+  if (modified_lines)
+    silent! exec a:start_line.','.a:start_line.'FormatLines'
   endif
-  return a:pos1[1] > a:pos2[1]
 endfunction
 
-function! PositionFromLocList(loc)
-    return [a:loc.lnum, a:loc.col]
+function! ReflowRange() range 
+  call Reflow(a:firstline, a:lastline)
 endfunction
 
-function! ShowError(error_number)
-  exec a:error_number . "ll"
+function! ReflowOpfunction(type)
+  call Reflow(line("'['"), line("']'"))
 endfunction
 
-function! ShowNextError()
-  let l:loc_list = getloclist(0)
-  if len(l:loc_list) == 0
-    echom "No Errors!"
-    return
+nnoremap <c-x> :set opfunc=ReflowOpfunction<cr>g@
+vnoremap <c-x> :call ReflowRange()<cr>
+
+function! ToggleComment(start_line, end_line)
+  silent! exec a:start_line.','.a:start_line.'yank x'
+  let start_line_text=@x
+  let range=string(a:start_line).','.string(a:end_line)
+  if (start_line_text =~ '^\s*///\? \?')
+    silent! exec range.'s:^\s*\zs///\? \?::'
+  else
+    let indent = indent(a:start_line)
+    silent! exec range.'s:^\s\{,'.indent.'}\zs\ze:// :'
   endif
-  let l:cursor_pos = [line("."), col(".")]
-  let l:index = 1
-  while l:index <= len(l:loc_list)
-    let l:error_pos = PositionFromLocList(l:loc_list[l:index - 1])
-    if PositionIsAfter(l:error_pos, l:cursor_pos)
-      call ShowError(l:index)
+endfunction
+
+function! ToggleCommentRange() range 
+  call ToggleComment(a:firstline, a:lastline)
+endfunction
+
+function! ToggleCommentOpfunction(type)
+  call ToggleComment(line("'['"), line("']'"))
+endfunction
+
+
+nnoremap <c-c><c-c> :call ToggleComment(line('.'), line('.'))<cr>
+nnoremap <c-c> :set opfunc=ToggleCommentOpfunction<cr>g@
+vnoremap <c-c> :call ToggleCommentRange()<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Templates
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! GetParentDirectories()
+  let path=substitute(expand('%:p'), "[^/]*$", "", "")
+  let paths=[]
+  while (len(path) > 0)
+    call add(paths, path)
+    let path = substitute(path, "[^/]*/$", "", "")
+  endwhile
+  return paths
+endfunction
+
+function! ReadFromTemplate()
+  for path in GetParentDirectories()
+    let template_file = path . '.template_generator'
+    if filereadable(template_file)
+      exec "0r !".template_file." %:p"
       return
     endif
-    let l:index = l:index + 1
-  endwhile
-  call ShowError(1)
+  endfor
 endfunction
 
-function! ShowPreviousError()
-  let l:loc_list = getloclist(0)
-  if len(l:loc_list) == 0
-    echom "No Errors!"
-    return
-  endif
-  let l:cursor_pos = [line("."), col(".")]
-  let l:index = len(l:loc_list)
-  while l:index > 0
-    let l:error_pos = PositionFromLocList(l:loc_list[l:index - 1])
-    if PositionIsBefore(l:error_pos, l:cursor_pos)
-      call ShowError(l:index)
-      return
-    endif
-    let l:index = l:index - 1
-  endwhile
-  call ShowError(len(l:loc_list))
+autocmd! BufNewFile * call ReadFromTemplate()
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Merge conflict resolution
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! DiffGetFromRight()
+  let window=winnr()
+  exec "wincmd l"
+  let bufname = bufname()
+  exec window."wincmd w"
+  exec "diffget ".bufname
+  exec "diffupdate"
 endfunction
 
-nnoremap ge :call ShowNextError()<cr>:ll<cr>
-nnoremap gE :call ShowPreviousError()<cr>:ll<cr>
-augroup clear_loc_list
-  autocmd!
-  autocmd BufWinEnter * call setloclist(0, [])
-augroup END
+function! DiffGetFromLeft()
+  let window=winnr()
+  exec "wincmd h"
+  let bufname = bufname()
+  exec window."wincmd w"
+  exec "diffget ".bufname
+  exec "diffupdate"
+endfunction
+
+nnoremap <c-g>l :call DiffGetFromRight()<cr>
+nnoremap <c-g>h :call DiffGetFromLeft()<cr>
+
