@@ -58,6 +58,7 @@ function replace {
 # FZF config
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND='rg --files'
+
 # checkout git branch
 function gch() {
   local branches branch
@@ -88,12 +89,23 @@ function add_to_path_if_exists() {
   [ -d "$1" ] && export PATH=$PATH:"$1"
 }
 add_to_path_if_exists $HOME/bin
+add_to_path_if_exists $HOME/.local/bin
+add_to_path_if_exists $HOME/.cargo/bin
+add_to_path_if_exists /opt/conda/condabin
 
 # allow unlimited core file size
 ulimit -c unlimited
 
 export EDITOR='nvim'
 alias vim=nvim
+
+if command -v hub &> /dev/null; then
+  alias git=hub
+fi
+
+if command -v aptitude &> /dev/null; then
+  alias apt=aptitude
+fi
 
 function mp4_to_gif {
   ffmpeg -i $1 -vf "fps=10,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse" -loop 0 $2
@@ -102,7 +114,6 @@ function mp4_to_gif {
 alias copy='xclip -i -selection clipboard'
 alias paste='xclip -o -selection clipboard'
 
-# automatically start tmux
-# if command -v tmux &> /dev/null && [ -z "$TMUX" ]; then
-#   tmux
-# fi
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
