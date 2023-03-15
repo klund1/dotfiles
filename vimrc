@@ -409,3 +409,17 @@ endfunction
 nnoremap <c-g>l :call DiffGetFromRight()<cr>
 nnoremap <c-g>h :call DiffGetFromLeft()<cr>
 
+function! ToggleDiff()
+  if &diff == 0
+    windo diffthis
+    windo set scrollbind
+    windo set cursorbind
+  else
+    windo diffoff
+    windo set noscrollbind
+    windo set nocursorbind
+  endif
+endfunction
+
+nnoremap <c-d> :call ToggleDiff()<cr>
+nnoremap <c-g>d :Gvdiffsplit<cr>

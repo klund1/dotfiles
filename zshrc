@@ -92,6 +92,7 @@ add_to_path_if_exists $HOME/bin
 add_to_path_if_exists $HOME/.local/bin
 add_to_path_if_exists $HOME/.cargo/bin
 add_to_path_if_exists /opt/conda/condabin
+add_to_path_if_exists /opt/mnav/nodejs/bin
 
 # allow unlimited core file size
 ulimit -c unlimited
@@ -113,7 +114,3 @@ function mp4_to_gif {
 
 alias copy='xclip -i -selection clipboard'
 alias paste='xclip -o -selection clipboard'
-
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion

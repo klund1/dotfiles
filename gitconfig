@@ -1,6 +1,8 @@
 [credential]
 	helper = cache
 [alias]
+  re = rebase @{u}
+  rei = rebase -i @{u}
   rec = rebase --continue
   rea = rebase --abort
   vdiff = "!f() { nvim -p `git diff --name-only $@` -c \"tabdo Gvdiffsplit $@\"; }; f"
