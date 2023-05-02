@@ -63,3 +63,16 @@ snippet br "/// \brief" b
 /// \brief ${1:TODO}
 ///
 endsnippet
+
+snippet class "class" b
+class ${1} {
+  public:
+    ${1}();
+	~${1}();
+
+	${0}
+
+  private:
+
+};
+endsnippet
