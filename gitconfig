@@ -7,6 +7,7 @@
   rea = rebase --abort
   vdiff = "!f() { nvim -p `git diff --name-only $@` -c \"tabdo Gvdiffsplit $@\"; }; f"
   vmerge = "!f() { nvim -p `git diff --name-only --diff-filter=U $@` -c \"tabdo Gvdiffsplit! $@\"; }; f"
+  review = "!f() { git vdiff `git merge-base HEAD feature/juno`; }; f"
 [core]
 	pager = less -F -X
-	excludesfile = ~/.gitignore
+	excludesfile = $HOME/.gitignore

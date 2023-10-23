@@ -68,9 +68,9 @@ Plug 'google/vim-codefmt'
 Plug 'google/vim-glaive'
 augroup autoformat_settings
   autocmd FileType c,cpp,cuda AutoFormatBuffer clang-format
-  autocmd FileType javascript,typescript AutoFormatBuffer prettier
+  autocmd FileType javascript,typescript,javascriptreact,typescriptreact AutoFormatBuffer prettier
   autocmd FileType go AutoFormatBuffer gofmt
-  autocmd FileType html,css,sass,scss,less,json AutoFormatBuffer js-beautify
+  autocmd FileType html,css,sass,scss,less AutoFormatBuffer js-beautify
   autocmd FileType java AutoFormatBuffer google-java-format
   " autocmd FileType python AutoFormatBuffer "black -l 79"
   autocmd FileType rust AutoFormatBuffer rustfmt
@@ -139,6 +139,10 @@ map g# <Plug>(asterisk-zg#)
 Plug 'kamykn/spelunker.vim'
 Plug 'kamykn/popup-menu.nvim'
 set nospell
+
+" Typescript
+Plug 'leafgarland/typescript-vim'
+let g:typescript_indent_disable = 1
 
 call plug#end()
 

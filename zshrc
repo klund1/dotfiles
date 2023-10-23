@@ -90,19 +90,16 @@ function add_to_path_if_exists() {
 }
 add_to_path_if_exists $HOME/bin
 add_to_path_if_exists $HOME/.local/bin
+add_to_path_if_exists /opt/mnav/nodejs/bin
 add_to_path_if_exists $HOME/.cargo/bin
 add_to_path_if_exists /opt/conda/condabin
-add_to_path_if_exists /opt/mnav/nodejs/bin
+add_to_path_if_exists $HOME/.npm-global/bin
 
 # allow unlimited core file size
 ulimit -c unlimited
 
 export EDITOR='nvim'
 alias vim=nvim
-
-if command -v hub &> /dev/null; then
-  alias git=hub
-fi
 
 if command -v aptitude &> /dev/null; then
   alias apt=aptitude
@@ -114,3 +111,7 @@ function mp4_to_gif {
 
 alias copy='xclip -i -selection clipboard'
 alias paste='xclip -o -selection clipboard'
+
+export NPM_CONFIG_PREFIX=~/.npm-global
+
+alias stealthapp="google-chrome-unstable --enable-unsafe-webgpu --enable-features=Vulkan --new-window --start-maximized --app=https://localhost/gui"
