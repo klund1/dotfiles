@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd ~/src/StealthApplication/ApplicationHome/release_env/log/
+tail -F -n1000 "$@"

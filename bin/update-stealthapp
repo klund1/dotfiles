@@ -1,0 +1,19 @@
+#! /bin/bash
+
+# Change this to match the local stealthapp checkout
+STEALTHAPP_DIR="${HOME}/src/StealthApplication"
+
+cd $STEALTHAPP_DIR
+git sync || exit
+mgit sync -j $(nproc) || exit
+mgit foreach "git sync --no-fetch" || exit
+./ApplicationHome/development/setupDevEnv || exit
+./ApplicationHome/development/updateDB || exit
+
+# Optional clean rebuild.
+# Removing the build directory is usually unnecessary, but can avoid some cmake
+# caching bugs. ccache should make the clean build relatively fast.
+#
+# rm -r build
+# ./configure.sh
+# ./build.sh

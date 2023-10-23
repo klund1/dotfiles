@@ -1,0 +1,108 @@
+#! /usr/bin/env python3
+
+import argparse
+import json
+import subprocess
+import sys
+
+
+def run(cmd):
+    output = subprocess.run(
+        cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+    )
+    if output.returncode != 0:
+        print(output.stderr.decode().strip())
+        raise subprocess.CalledProcessError(
+            output.returncode, output.args, output.stdout, output.stderr
+        )
+
+    return output.stdout.decode().strip()
+
+
+def get_current_branch_or_sha() -> str:
+    return run(
+        "git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD"
+    )
+
+
+def get_branch_info():
+    fields = {
+        "branch": "%(refname:short)",
+        "remote": "%(upstream:remotename)",
+        "upstream_branch": "%(upstream:short)",
+        "tracking_status": "%(upstream:track)",
+    }
+    branch_info_output = run(
+        f"git for-each-ref --format='{json.dumps(fields)}' refs/heads"
+    )
+    return json.loads("[" + ",".join(branch_info_output.split("\n")) + "]")
+
+
+def get_sha(branch_name):
+    return run(f"git rev-parse {branch_name}")
+
+
+def should_update_branch(branch_info):
+    branch = branch_info["branch"]
+    upstream_branch = branch_info["upstream_branch"]
+    return (
+        branch_info["upstream_branch"] != ""
+        and branch_info["remote"] != "."
+        and branch_info["tracking_status"] != "[gone]"
+        and get_sha(branch) != get_sha(upstream_branch)
+    )
+
+
+def update_branch(branch):
+    run(f"git checkout {branch}")
+    try:
+        run("git rebase @{u}")
+        print(f"Updated branch: {branch}")
+    except:
+        print(f"Failed to update branch: {branch}")
+        run("git rebase --abort")
+
+
+def should_delete_branch(branch_info):
+    return (
+        branch_info["upstream_branch"] != ""
+        and branch_info["remote"] != "."
+        and branch_info["tracking_status"] == "[gone]"
+        and branch_info["upstream_branch"]
+        == f"{branch_info['remote']}/{branch_info['branch']}"
+    )
+
+
+def delete_branch(branch):
+    run(f"git branch -D {branch}")
+    print(f"Deleted branch: {branch}")
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--no-fetch", dest="fetch", action="store_false")
+    args = parser.parse_args()
+
+    if args.fetch:
+        try:
+            run("git fetch")
+        except:
+            sys.exit(1)
+
+    initial_branch = get_current_branch_or_sha()
+    try:
+        branch_infos = get_branch_info()
+
+        for branch_info in branch_infos:
+            if should_update_branch(branch_info):
+                update_branch(branch_info["branch"])
+
+        for branch_info in branch_infos:
+            if should_delete_branch(branch_info):
+                delete_branch(branch_info["branch"])
+    finally:
+        run(f"git checkout {initial_branch}")
+
+
+if __name__ == "__main__":
+    main()
