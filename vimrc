@@ -6,6 +6,9 @@ let mapleader=" "
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin(stdpath('config') . '/plugged')
 
+" Copilot
+Plug 'github/copilot.vim'
+
 " Code completion
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 set hidden
@@ -105,6 +108,7 @@ nnoremap <leader>cc :SwitchCamelCase<cr>
 nnoremap <leader>cC :SwitchCapitalCamelCase<cr>
 
 " Colorscheme
+Plug 'EdenEast/nightfox.nvim'
 Plug 'NLKNguyen/papercolor-theme'
 let g:PaperColor_Theme_Options = {
  \  'theme': {
@@ -119,11 +123,12 @@ let g:PaperColor_Theme_Options = {
 
 " Git
 Plug 'tpope/vim-fugitive'
+Plug 'sindrets/diffview.nvim'
 
 " Searching
 Plug 'stefandtw/quickfix-reflector.vim'
 Plug 'jremmen/vim-ripgrep'
-let g:rg_command = 'rg --vimgrep -S'
+let g:rg_command = 'rg --hidden --vimgrep -S'
 
 " Rust
 Plug 'rust-lang/rust.vim'
@@ -136,13 +141,16 @@ map g* <Plug>(asterisk-zg*)
 map g# <Plug>(asterisk-zg#)
 
 " CamelCase spellcheck
-Plug 'kamykn/spelunker.vim'
-Plug 'kamykn/popup-menu.nvim'
-set nospell
+" Plug 'kamykn/spelunker.vim'
+" Plug 'kamykn/popup-menu.nvim'
+" set nospell
 
 " Typescript
 Plug 'leafgarland/typescript-vim'
 let g:typescript_indent_disable = 1
+
+" WGSL
+Plug 'DingDean/wgsl.vim'
 
 call plug#end()
 
@@ -152,6 +160,7 @@ call plug#end()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 colorscheme PaperColor
+" colorscheme carbonfox
 set cursorline
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -427,3 +436,9 @@ endfunction
 
 nnoremap <c-d> :call ToggleDiff()<cr>
 nnoremap <c-g>d :Gvdiffsplit<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Fix syntax highlighting
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+autocmd BufEnter * :syntax sync fromstart
+

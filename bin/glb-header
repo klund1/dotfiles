@@ -1,0 +1,7 @@
+#! /bin/bash
+JSON_BYTES=$(xxd -s 12 -l 4 -ps $1 | tac -rs .. | tr '[:lower:]' '[:upper:]' | xargs -I@ echo "ibase=16; @" | bc)
+FILE_HEADER_BYTES=20
+HEADER_AND_JSON_BYTES=$(echo ${FILE_HEADER_BYTES} + ${JSON_BYTES} | bc)
+
+head -c ${HEADER_AND_JSON_BYTES} $1 | tail -c ${JSON_BYTES}
+echo

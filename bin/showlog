@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cd ~/src/StealthApplication/ApplicationHome/release_env/log/
+cd ~/src/stealth-clinical-application/ApplicationHome/release_env/log/
 tail -F -n1000 "$@"

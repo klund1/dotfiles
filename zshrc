@@ -57,7 +57,7 @@ function replace {
 
 # FZF config
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_COMMAND='rg --files'
+export FZF_DEFAULT_COMMAND='rg --hidden --glob=!.git/ --files'
 
 # checkout git branch
 function gch() {
@@ -94,6 +94,8 @@ add_to_path_if_exists /opt/mnav/nodejs/bin
 add_to_path_if_exists $HOME/.cargo/bin
 add_to_path_if_exists /opt/conda/condabin
 add_to_path_if_exists $HOME/.npm-global/bin
+add_to_path_if_exists /usr/local/cuda/bin
+add_to_path_if_exists /opt/nvim-linux-x86_64/bin
 
 # allow unlimited core file size
 ulimit -c unlimited
@@ -115,3 +117,30 @@ alias paste='xclip -o -selection clipboard'
 export NPM_CONFIG_PREFIX=~/.npm-global
 
 alias stealthapp="google-chrome-unstable --enable-unsafe-webgpu --enable-features=Vulkan --new-window --start-maximized --app=https://localhost/gui"
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/opt/conda/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+  eval "$__conda_setup"
+else
+  if [ -f "/opt/conda/etc/profile.d/conda.sh" ]; then
+    . "/opt/conda/etc/profile.d/conda.sh"
+  else
+    export PATH="/opt/conda/bin:$PATH"
+  fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
+function rtm {
+  (cd ${HOME}/src/stealth-clinical-application/RTM && pnpm "$@")
+}
+
+function vc {
+  (cd ${HOME}/src/stealth-clinical-application/VisController && pnpm "$@")
+}
