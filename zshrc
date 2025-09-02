@@ -51,6 +51,7 @@ setopt HIST_IGNORE_ALL_DUPS
 alias find-in-file="find -type f -print0 | xargs -0 grep -s"
 alias find-file="find -type f | grep -s"
 alias :q=exit
+alias lg=lazygit
 function replace {
   find -type f | xargs sed -i -e "s/${1}/${2}/g"
 }
@@ -95,7 +96,7 @@ add_to_path_if_exists $HOME/.cargo/bin
 add_to_path_if_exists /opt/conda/condabin
 add_to_path_if_exists $HOME/.npm-global/bin
 add_to_path_if_exists /usr/local/cuda/bin
-add_to_path_if_exists /opt/nvim-linux-x86_64/bin
+add_to_path_if_exists /usr/local/go/bin
 
 # allow unlimited core file size
 ulimit -c unlimited

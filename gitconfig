@@ -5,12 +5,12 @@
   rei = rebase -i @{u}
   rec = rebase --continue
   rea = rebase --abort
-  vdiff = "!f() { nvim -p `git diff --name-only $@` -c \"tabdo Gvdiffsplit $@\"; }; f"
+  vdiff = "!f() { nvim -c \"DiffviewOpen $@\"; }; f"
   vmerge = "!f() { nvim -p `git diff --name-only --diff-filter=U $@` -c \"tabdo Gvdiffsplit! $@\"; }; f"
   review = "!f() { git vdiff `git merge-base HEAD $1`; }; f"
 [core]
 	pager = less -F -X
-	excludesfile = $HOME/.gitignore
+	excludesfile = /home/stealthadmin/.gitignore
 [user]
 	name = Kyle Lund
 	email = kyle.lund@medtronic.com

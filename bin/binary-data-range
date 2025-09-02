@@ -1,0 +1,21 @@
+#! /usr/bin/python
+
+import numpy as np
+import sys
+
+def main():
+  args = sys.argv
+  if len(args) < 2 or len(args) > 3:
+      print(f"Usage: {args[0]} FILENAME <DATATYPE>")
+      sys.exit(1)
+  
+  datatype = "uint16"
+  if len(args) >= 3:
+      datatype = args[2]
+  data = np.fromfile(args[1], datatype)
+
+  print(np.min(data))
+  print(np.max(data))
+
+if __name__ == "__main__":
+    main()

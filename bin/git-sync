@@ -85,7 +85,7 @@ def main():
 
     if args.fetch:
         try:
-            run("git fetch")
+            run("git fetch --prune")
         except:
             sys.exit(1)
 

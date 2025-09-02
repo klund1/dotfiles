@@ -1,0 +1,23 @@
+#!/usr/bin/python
+
+import sys
+
+def main():
+    if len(sys.argv) != 2:
+        print(f'Usage: {sys.argv[0]} <FILENAME>')
+        sys.exit(1)
+
+    with open(sys.argv[1]) as input_file:
+        data = input_file.read()
+
+    with open(sys.argv[1] + ".bin", "wb") as output_file:
+        array = []
+        for i in range(0, len(data), 2):
+            try:
+                array.append(int(data[i:i+2], 16))
+            except:
+                continue
+        output_file.write(bytearray(array))
+
+if __name__ == '__main__':
+    main()
